@@ -2,5 +2,5 @@
 *.DS_store
 
 # Temporary directory for debugging extension samples
-_debug
-_metadata
+src/_debug
+src/_metadata
