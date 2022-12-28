@@ -1,7 +1,7 @@
-Chat GPT anti censorship
------------
+## Chat GPT anti censorship
+This is a little extension I put up in a few minutes after I discovered that chat GPT was using an endpoint for content reporting.
 
-Features
+## Features
 * #### Block content from getting censored after it's written
   ![image](https://user-images.githubusercontent.com/66485277/209876744-15a01872-6bd0-4e6d-8fac-e949704fc60c.png)
 
