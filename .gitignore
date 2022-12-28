@@ -1,6 +1,9 @@
 *~
 *.DS_store
 
+src.pem
+src.crx
+
 # Temporary directory for debugging extension samples
 src/_debug
 src/_metadata
