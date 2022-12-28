@@ -3,6 +3,7 @@
 
 src.pem
 src.crx
+ChatGPT-Moderation-Blocker.crx
 
 # Temporary directory for debugging extension samples
 src/_debug

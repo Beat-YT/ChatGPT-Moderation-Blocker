@@ -1,5 +1,5 @@
 {
-  "description": "Block question reporting on OpenAI Chat GPT.\nFeatures: Block a response from getting scensored after it's written, Block a response from getting flagged and Block a question from getting flagged.",
+  "description": "This extension block text content from getting flagged or blocked by the filter.",
   "name": "Chat GPT anti censorship",
   "version": "2.1",
   "permissions": [
