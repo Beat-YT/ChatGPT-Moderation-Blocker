@@ -1,0 +1,21 @@
+{
+  "description": "Block question reporting on OpenAI Chat GPT.\nFeatures: Block a response from getting scensored after it's written, Block a response from getting flagged and Block a question from getting flagged.",
+  "name": "Chat GPT anti censorship",
+  "version": "2.1",
+  "permissions": [
+    "declarativeNetRequest"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "host_permissions": [
+    "*://chat.openai.com/*"
+  ],
+  "manifest_version": 3
+}
