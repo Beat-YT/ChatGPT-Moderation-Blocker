@@ -11,5 +11,19 @@
         },
         "id": 1,
         "priority": 1
+    },
+    {
+
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "api.openai.com/v1/moderations",
+            "domains": [
+                "api.openai.com"
+            ]
+        },
+        "id": 2,
+        "priority": 2
     }
 ]
