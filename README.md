@@ -2,6 +2,11 @@
 This is a little extension I put up in a few minutes after I discovered that chat GPT was using an endpoint for content reporting.
 
 The crx is available for download on the [releases page](https://github.com/Beat-YT/ChatGPT-Moderation-Blocker/releases)
+
+# ⚠️ IMPORTANT⚠️
+**this extension does not block chat gpt integrated filter, it will still refuse to answer like "sorry this is violating open ai policy"
+check the features below**
+
 ## Features
 * #### Block content from getting censored after it's written
   ![image](https://user-images.githubusercontent.com/66485277/209876744-15a01872-6bd0-4e6d-8fac-e949704fc60c.png)
