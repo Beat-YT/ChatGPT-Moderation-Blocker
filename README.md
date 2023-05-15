@@ -4,7 +4,7 @@ This is a little extension I put up in a few minutes after I discovered that cha
 The crx is available for download on the [releases page](https://github.com/Beat-YT/ChatGPT-Moderation-Blocker/releases)
 
 # ⚠️ IMPORTANT⚠️
-**this extension does not block chat gpt integrated filter, it will still refuse to answer like "sorry this is violating open ai policy"
+**This extension does not block chat gpt integrated filter, it will still refuse to answer like "sorry this is violating open ai policy"
 check the features below**
 
 ## Features
