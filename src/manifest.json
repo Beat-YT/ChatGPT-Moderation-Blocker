@@ -1,7 +1,7 @@
 {
   "description": "This extension block text content from getting flagged or blocked by the filter.",
   "name": "Chat GPT anti censorship",
-  "version": "2.2",
+  "version": "3.0",
   "permissions": [
     "declarativeNetRequest"
   ],
@@ -18,5 +18,17 @@
     "*://chat.openai.com/*",
     "*://api.openai.com/*"
   ],
-  "manifest_version": 3
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "public/*"
+      ],
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://api.openai.com/*"
+      ]
+    }
+  ],
+  "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz0gmrQsEUONC1jAj4uWxUo657dwFE7NEaYiqtZS4tHu1j7+OPR5/68dx9zpazoepwmsPjGK758HLGqqEWeVHME9tDUqZY6cJSCuLjqNM+D6Fxy4As91Gjs82XB6vPMJW4bPdKTuGuobrd7EGpud8MPcPKXlJGyh/7JIECqusLd7kC3sbFckmQVIfdSpjkJCqFrQnvsF9+iUfx/65SEflXfZUPyci4+SvOwF6/R8QQKyk7NB1pw/iKaPogp5wmAWmH62FawLD9kSuwBN5D3t7WVn4HAVgzOHaKkr99Hgk6R5fkj8B6wM0qUDumT6dWg68RSVzbrnDDXUgbi2PPLXqOQIDAQAB"
 }
