@@ -21,7 +21,7 @@
             }
         },
         "condition": {
-            "urlFilter": "chat.openai.com/_next/static/chunks/pages/a_app-811bdb82b141024c.js",
+            "urlFilter": "chat.openai.com/_next/static/chunks/pages/_app-811bdb82b141024c.js",
             "domains": [
                 "chat.openai.com"
             ]
