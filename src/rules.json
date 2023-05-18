@@ -15,23 +15,6 @@
     {
 
         "action": {
-            "type": "redirect",
-            "redirect": {
-                "url": "chrome-extension://aaibfgjceomfbogoicgjjlabohghmelm/public/_app-811bdb82b141024c.js"
-            }
-        },
-        "condition": {
-            "urlFilter": "chat.openai.com/_next/static/chunks/pages/a_app-811bdb82b141024c.js",
-            "domains": [
-                "chat.openai.com"
-            ]
-        },
-        "id": 3,
-        "priority": 2
-    },
-    {
-
-        "action": {
             "type": "block"
         },
         "condition": {
@@ -41,6 +24,6 @@
             ]
         },
         "id": 2,
-        "priority": 3
+        "priority": 2
     }
 ]

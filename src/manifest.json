@@ -3,7 +3,8 @@
   "name": "Chat GPT anti censorship",
   "version": "3.0",
   "permissions": [
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "scripting"
   ],
   "declarative_net_request": {
     "rule_resources": [
@@ -18,15 +19,12 @@
     "*://chat.openai.com/*",
     "*://api.openai.com/*"
   ],
-  "web_accessible_resources": [
+  "content_scripts": [
     {
-      "resources": [
-        "public/*"
-      ],
-      "matches": [
-        "https://chat.openai.com/*",
-        "https://api.openai.com/*"
-      ]
+      "world": "MAIN",
+      "js": ["modapi-disabler.js"],
+      "matches": ["https://chat.openai.com/*"],
+      "run_at": "document_start"
     }
   ],
   "icons": {
