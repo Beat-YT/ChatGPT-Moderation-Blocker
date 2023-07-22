@@ -1,7 +1,7 @@
 ## Chat GPT anti censorship
 This is a little extension I put up in a few minutes after I discovered that chat GPT was using an endpoint for content reporting.
 
-Update: ChatGPT changed the way moderation works, so unfortunately, this extension no longer works.
+# Update: ChatGPT changed the way moderation works, so unfortunately, this extension no longer works.
 I will update this extension if I find a workaround for the new moderation system, but that's unlikely to happen. 
 
 The crx is available for download on the [releases page](https://github.com/Beat-YT/ChatGPT-Moderation-Blocker/releases)
