@@ -1,5 +1,5 @@
 ## Chat GPT anti censorship
-This is a little extension I put up in a few minutes after I discovered that chat GPT was using an endpoint for content reporting.
+This extension simply pretent the website from hiding generated text under a banner saying that it's violating the terms of services!
 
 The crx is available for download on the [releases page](https://github.com/Beat-YT/ChatGPT-Moderation-Blocker/releases)
 and on the [chrome web store](https://chrome.google.com/webstore/detail/chat-gpt-anti-censorship/aaibfgjceomfbogoicgjjlabohghmelm)
