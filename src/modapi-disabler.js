@@ -23,7 +23,13 @@
                 /** @type {Response} */
                 const response = await _fetch.apply(this, arguments);
 
-                if (response.status !== 200) {
+                if (response.status !== 200 || !response.headers.get('content-type')?.includes('text/event-stream')) {
+                    if (response.status !== 200) {
+                        console.log('response status not 200, ignoring');
+                    } else {
+                        console.log('response content type not event stream, ignoring');
+                    }
+
                     return response;
                 }
 
@@ -37,12 +43,12 @@
                             return reader.read().then(({ done, value }) => {
                                 // When no more data needs to be consumed, close the stream
                                 if (done) {
+                                    console.log('Stream complete');
                                     controller.close();
                                     return;
                                 }
 
                                 const decoded = textDecoder.decode(value);
-
                                 console.log(decoded)
 
                                 if (!decoded.includes("moderation_response")) {
@@ -83,6 +89,8 @@
                     },
                 });
 
+
+
                 return new Response(cooked, response);
             }
 
@@ -112,6 +120,85 @@
         return await _fetch.apply(this, arguments);;
     }
 
+
+
+    // make a backup of the original WebSocket class
+    const _WebSocket = window.WebSocket;
+
+
+    // replace the WebSocket class with a new one that will modify the data from the server
+
+    window.WebSocket = function (url, protocols) {
+        const ws = new _WebSocket(url, protocols);
+
+        console.log('new websocket', url, protocols);
+
+        if (url.includes('/client/hubs/conversations')) {
+            
+            ws.addEventListener('message', (event) => {
+                if (event.data.includes('__isCheckedOut')) return;
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+                event.preventDefault();
+
+                try {
+                    const parsed = JSON.parse(event.data);
+                    if (!parsed.data || parsed.dataType !== 'json') return;
+
+                    let data = atob(parsed.data.body);
+                    console.log('received event', data);
+
+                    if (data.includes("moderation_response")) {
+                        console.log('detected moderation response, trying to remove it');
+
+                        const splitter = data.split('data: ');
+                        splitter.shift();
+
+                        data = splitter.map((dataChunk) => {
+                            if (dataChunk.trim() == '[DONE]') {
+                                return 'data: ' + dataChunk;
+                            }
+
+                            try {
+                                const parsed = JSON.parse(dataChunk.trim());
+                                if ('moderation_response' in parsed || parsed.type === 'moderation') {
+                                    return null;
+                                }
+                            } catch (e) {
+                                console.error('failed to parse chunk', e);
+                                return 'data: ' + dataChunk;
+                            }
+
+                            return 'data: ' + JSON.stringify(parsed);
+                        }).filter((dataChunk) => dataChunk !== null);
+
+                        console.log('no more moderation! poof', data)
+                        if (data.length === 0) {
+                            return;
+                        }
+
+                        data = data.join('\n\n');
+                        parsed.data.body = btoa(data);
+                    }
+
+                    parsed.__isCheckedOut = true;
+                    ws.dispatchEvent(new MessageEvent('message', {
+                        ...event,
+                        data: JSON.stringify(parsed),
+                    }));
+
+                } catch (e) {
+                    console.error(e)
+                }
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+                event.preventDefault();
+            });
+        }
+
+
+        return ws;
+    }
 
 
 })();
