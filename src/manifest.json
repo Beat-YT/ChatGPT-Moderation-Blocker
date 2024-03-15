@@ -1,7 +1,7 @@
 {
   "description": "This extension block text content from getting flagged or blocked by the moderation filter.",
   "name": "Chat GPT anti censorship",
-  "version": "3.2",
+  "version": "3.5",
   "permissions": [
     "declarativeNetRequest"
   ],
