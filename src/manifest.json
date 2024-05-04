@@ -1,9 +1,12 @@
 {
   "description": "This extension block text content from getting flagged or blocked by the moderation filter.",
   "name": "Chat GPT anti censorship",
-  "version": "3.5",
-  "permissions": [
-    "declarativeNetRequest"
+  "version": "3.6",
+  "permissions": ["declarativeNetRequest"],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://api.openai.com/*",
+    "https://chatgpt.com/*"
   ],
   "declarative_net_request": {
     "rule_resources": [
@@ -14,15 +17,14 @@
       }
     ]
   },
-  "host_permissions": [
-    "*://chat.openai.com/*",
-    "*://api.openai.com/*"
-  ],
   "content_scripts": [
     {
       "world": "MAIN",
       "js": ["modapi-disabler.js"],
-      "matches": ["https://chat.openai.com/*"],
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*"
+      ],
       "run_at": "document_start"
     }
   ],

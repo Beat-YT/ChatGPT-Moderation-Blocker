@@ -12,24 +12,20 @@
         try {
 
             if (url && options &&
-                url.startsWith("https://chat.openai.com/backend-api/conversation") &&
+                url.startsWith("https://chatgpt.com/backend-api/conversation") &&
                 options.method === "POST"
             ) {
-                // we parse the body and set the modapi support to false
+                /*
                 const body = JSON.parse(options.body);
                 body['supports_modapi'] = false;
                 options.body = JSON.stringify(body);
+                */
 
                 /** @type {Response} */
                 const response = await _fetch.apply(this, arguments);
 
                 if (response.status !== 200 || !response.headers.get('content-type')?.includes('text/event-stream')) {
-                    if (response.status !== 200) {
-                        console.log('response status not 200, ignoring');
-                    } else {
-                        console.log('response content type not event stream, ignoring');
-                    }
-
+                    console.log('conversation api response not suitable for modification, ignoring');
                     return response;
                 }
 
@@ -49,11 +45,12 @@
                                 }
 
                                 const decoded = textDecoder.decode(value);
-                                console.log(decoded)
+                                console.log('[MOD]', decoded)
 
                                 if (!decoded.includes("moderation_response")) {
                                     controller.enqueue(value);
                                 } else {
+                                    console.log('[MOD] detected moderation response, trying to remove it');
                                     // now we gotta iterate through the dataes and remove all the moderation responses
                                     const splitter = decoded.split('data: ');
                                     splitter.shift();
@@ -72,8 +69,7 @@
                                         return 'data: ' + JSON.stringify(parsed);
                                     }).filter((dataChunk) => dataChunk !== null);
 
-                                    console.log('no more moderation! poof', reponse)
-
+                                    console.log('[MOD] no more moderation! poof', reponse)
 
                                     if (reponse.length === 0) {
                                         return pump();
@@ -95,7 +91,7 @@
             }
 
             else if (url && options &&
-                url.startsWith("https://chat.openai.com/backend-api/conversation") &&
+                url.startsWith("https://chatgpt.com/backend-api/conversation") &&
                 options.method === "GET") {
 
                 const response = await _fetch.apply(this, arguments);
