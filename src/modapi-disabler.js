@@ -8,11 +8,14 @@
     // the request parameters to set the modapi to false
 
     window.fetch = async function (url, options) {
+        /** @type {string} */
+        const requestUrl = typeof url === 'string' ? url : url.url;
+
         // we only want to modify the request to the conversation endpoint and only if the modapi is enabled
         try {
 
             if (url && options &&
-                url.startsWith("https://chatgpt.com/backend-api/conversation") &&
+                requestUrl.startsWith("https://chatgpt.com/backend-api/conversation") &&
                 options.method === "POST"
             ) {
                 /*
@@ -91,12 +94,15 @@
             }
 
             else if (url && options &&
-                url.startsWith("https://chatgpt.com/backend-api/conversation") &&
+                requestUrl.startsWith("https://chatgpt.com/backend-api/conversation") &&
                 options.method === "GET") {
 
+                /**
+                 * @type {Response}
+                 */
                 const response = await _fetch.apply(this, arguments);
 
-                if (response.status !== 200) {
+                if (response.status !== 200 || !response.headers.get('content-type')?.startsWith('application/json')) {
                     return response;
                 }
 
@@ -125,76 +131,73 @@
     // replace the WebSocket class with a new one that will modify the data from the server
 
     window.WebSocket = function (url, protocols) {
-        const ws = new _WebSocket(url, protocols);
+        try {
+            console.log('[MOD-WS] new websocket', url, protocols);
+            const ws = new _WebSocket(url, protocols);
+            console.log('[MOD-WS] websocket created', url, protocols);
 
-        console.log('new websocket', url, protocols);
+            if (url.includes('/client/hubs/conversations')) {
+                ws.addEventListener('message', (event) => {
+                    if (event.data.includes('__isCheckedOut')) return;
+                    event.stopImmediatePropagation();
+                    event.stopPropagation();
+                    event.preventDefault();
 
-        if (url.includes('/client/hubs/conversations')) {
-            
-            ws.addEventListener('message', (event) => {
-                if (event.data.includes('__isCheckedOut')) return;
-                event.stopImmediatePropagation();
-                event.stopPropagation();
-                event.preventDefault();
+                    try {
+                        const parsed = JSON.parse(event.data);
+                        if (!parsed.data || parsed.dataType !== 'json') return;
 
-                try {
-                    const parsed = JSON.parse(event.data);
-                    if (!parsed.data || parsed.dataType !== 'json') return;
+                        let data = atob(parsed.data.body);
+                        console.log('[MOD-WS] received event', data);
 
-                    let data = atob(parsed.data.body);
-                    console.log('received event', data);
+                        if (data.includes("moderation_response")) {
+                            console.log('[MOD-WS] detected moderation response, trying to remove it');
 
-                    if (data.includes("moderation_response")) {
-                        console.log('detected moderation response, trying to remove it');
+                            const splitter = data.split('data: ');
+                            splitter.shift();
 
-                        const splitter = data.split('data: ');
-                        splitter.shift();
-
-                        data = splitter.map((dataChunk) => {
-                            if (dataChunk.trim() == '[DONE]') {
-                                return 'data: ' + dataChunk;
-                            }
-
-                            try {
-                                const parsed = JSON.parse(dataChunk.trim());
-                                if ('moderation_response' in parsed || parsed.type === 'moderation') {
-                                    return null;
+                            data = splitter.map((dataChunk) => {
+                                if (dataChunk.trim() == '[DONE]') {
+                                    return 'data: ' + dataChunk;
                                 }
-                            } catch (e) {
-                                console.error('failed to parse chunk', e);
-                                return 'data: ' + dataChunk;
+
+                                try {
+                                    const parsed = JSON.parse(dataChunk.trim());
+                                    if ('moderation_response' in parsed || parsed.type === 'moderation') {
+                                        return null;
+                                    }
+                                } catch (e) {
+                                    console.error('failed to parse chunk', e);
+                                    return 'data: ' + dataChunk;
+                                }
+
+                                return 'data: ' + JSON.stringify(parsed);
+                            }).filter((dataChunk) => dataChunk !== null);
+
+                            console.log('[MOD-WS] no more moderation! poof', data)
+                            if (data.length === 0) {
+                                return;
                             }
 
-                            return 'data: ' + JSON.stringify(parsed);
-                        }).filter((dataChunk) => dataChunk !== null);
-
-                        console.log('no more moderation! poof', data)
-                        if (data.length === 0) {
-                            return;
+                            data = data.join('\n\n');
+                            parsed.data.body = btoa(data);
                         }
 
-                        data = data.join('\n\n');
-                        parsed.data.body = btoa(data);
+                        parsed.__isCheckedOut = true;
+                        ws.dispatchEvent(new MessageEvent('message', {
+                            ...event,
+                            data: JSON.stringify(parsed),
+                        }));
+                    } catch (e) {
+                        console.error('[MOD-WS] error while parsing', e)
                     }
+                });
+            }
 
-                    parsed.__isCheckedOut = true;
-                    ws.dispatchEvent(new MessageEvent('message', {
-                        ...event,
-                        data: JSON.stringify(parsed),
-                    }));
-
-                } catch (e) {
-                    console.error(e)
-                }
-                event.stopImmediatePropagation();
-                event.stopPropagation();
-                event.preventDefault();
-            });
+            return ws;
+        } catch (e) {
+            console.error('[MOD-WS] Failed to create websocket', e)
+            throw e;
         }
-
-
-        return ws;
     }
-
-
 })();
