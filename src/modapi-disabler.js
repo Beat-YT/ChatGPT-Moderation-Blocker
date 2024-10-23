@@ -7,6 +7,22 @@
     // then we replace it with a function that will modify 
     // the request parameters to set the modapi to false
 
+    /**
+     * 
+     * @param {string} chunk 
+     * @returns 
+     */
+    function filterChunk(chunk) {
+        try {
+            let parts = chunk.split('\n');
+            parts = parts.filter(x => !x.includes('"moderation"') || !x.includes('"moderation_response"'));
+            return parts.join('\n');
+        } catch (e) {
+            console.error('failed to parse chunk', e);
+            return null;
+        }
+    }
+
     window.fetch = async function (url, options) {
         /** @type {string} */
         const requestUrl = typeof url === 'string' ? url : url.url;
@@ -50,37 +66,18 @@
                                 const decoded = textDecoder.decode(value);
                                 console.log('[MOD]', decoded)
 
-                                if (!decoded.includes("moderation_response")) {
+                                if (!decoded.includes("moderation")) {
                                     controller.enqueue(value);
                                 } else {
                                     console.log('[MOD] detected moderation response, trying to remove it');
-                                    // now we gotta iterate through the dataes and remove all the moderation responses
-                                    const splitter = decoded.split('data: ');
-                                    splitter.shift();
+                                    const newChunks = filterChunk(decoded);
 
-                                    const reponse = splitter.map((dataChunk) => {
-                                        if (dataChunk.trim() == '[DONE]') {
-                                            return 'data: ' + dataChunk;
-                                        }
-
-                                        const parsed = JSON.parse(dataChunk.trim());
-
-                                        if ('moderation_response' in parsed) {
-                                            return null;
-                                        }
-
-                                        return 'data: ' + JSON.stringify(parsed);
-                                    }).filter((dataChunk) => dataChunk !== null);
-
-                                    console.log('[MOD] no more moderation! poof', reponse)
-
-                                    if (reponse.length === 0) {
+                                    if (newChunks.length === 0) {
                                         return pump();
                                     }
 
-                                    controller.enqueue(new TextEncoder().encode(reponse.join('\n\n')));
+                                    controller.enqueue(new TextEncoder().encode(newChunks));
                                 }
-
 
                                 return pump();
                             });
@@ -145,42 +142,25 @@
 
                     try {
                         const parsed = JSON.parse(event.data);
-                        if (!parsed.data || parsed.dataType !== 'json') return;
+                        if (!parsed.data) return;
 
-                        let data = atob(parsed.data.body);
-                        console.log('[MOD-WS] received event', data);
+                        if (parsed.dataType !== 'json') {
+                            console.log('[MOD-WS] Cant handle data type', parsed.dataType);
+                            return;
+                        }
 
-                        if (data.includes("moderation_response")) {
-                            console.log('[MOD-WS] detected moderation response, trying to remove it');
+                        let chunk = atob(parsed.data.body);
+                        console.log('[MOD-WS] received', chunk);
 
-                            const splitter = data.split('data: ');
-                            splitter.shift();
+                        if (chunk.includes("moderation")) {
+                            console.log('[MOD-WS] detected moderation in response, trying to remove it');
 
-                            data = splitter.map((dataChunk) => {
-                                if (dataChunk.trim() == '[DONE]') {
-                                    return 'data: ' + dataChunk;
-                                }
-
-                                try {
-                                    const parsed = JSON.parse(dataChunk.trim());
-                                    if ('moderation_response' in parsed || parsed.type === 'moderation') {
-                                        return null;
-                                    }
-                                } catch (e) {
-                                    console.error('failed to parse chunk', e);
-                                    return 'data: ' + dataChunk;
-                                }
-
-                                return 'data: ' + JSON.stringify(parsed);
-                            }).filter((dataChunk) => dataChunk !== null);
-
-                            console.log('[MOD-WS] no more moderation! poof', data)
-                            if (data.length === 0) {
+                            const newChunk = filterChunk(chunk);
+                            if (!newChunk || newChunk.length === 0) {
                                 return;
                             }
 
-                            data = data.join('\n\n');
-                            parsed.data.body = btoa(data);
+                            parsed.data.body = btoa(newChunk);
                         }
 
                         parsed.__isCheckedOut = true;
@@ -189,7 +169,7 @@
                             data: JSON.stringify(parsed),
                         }));
                     } catch (e) {
-                        console.error('[MOD-WS] error while parsing', e)
+                        console.error('[MOD-WS] error', e)
                     }
                 });
             }
