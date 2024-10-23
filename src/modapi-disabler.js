@@ -15,7 +15,7 @@
     function filterChunk(chunk) {
         try {
             let parts = chunk.split('\n');
-            parts = parts.filter(x => !x.includes('"moderation"') || !x.includes('"moderation_response"'));
+            parts = parts.filter(x => !x.includes('"moderation"') && !x.includes('"moderation_response"'));
             return parts.join('\n');
         } catch (e) {
             console.error('failed to parse chunk', e);
@@ -140,6 +140,8 @@
                     event.stopPropagation();
                     event.preventDefault();
 
+                    event.origin
+
                     try {
                         const parsed = JSON.parse(event.data);
                         if (!parsed.data) return;
@@ -169,7 +171,8 @@
                             data: JSON.stringify(parsed),
                         }));
                     } catch (e) {
-                        console.error('[MOD-WS] error', e)
+                        console.error('[MOD-WS] error', e);
+                        
                     }
                 });
             }
