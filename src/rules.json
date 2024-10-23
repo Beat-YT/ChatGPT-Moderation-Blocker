@@ -4,9 +4,9 @@
             "type": "block"
         },
         "condition": {
-            "urlFilter": "chat.openai.com/backend-api/moderations",
+            "urlFilter": "chatgpt.com/backend-api/moderations",
             "domains": [
-                "chat.openai.com"
+                "chatgpt.com"
             ]
         },
         "id": 1,
