@@ -10,7 +10,6 @@
     /**
      * 
      * @param {string} chunk 
-     * @returns 
      */
     function filterChunk(chunk) {
         try {
@@ -29,7 +28,6 @@
 
         // we only want to modify the request to the conversation endpoint and only if the modapi is enabled
         try {
-
             if (url && options &&
                 requestUrl.startsWith("https://chatgpt.com/backend-api/conversation") &&
                 options.method === "POST"
@@ -85,8 +83,6 @@
                     },
                 });
 
-
-
                 return new Response(cooked, response);
             }
 
@@ -140,12 +136,9 @@
                     event.stopPropagation();
                     event.preventDefault();
 
-                    event.origin
-
                     try {
                         const parsed = JSON.parse(event.data);
                         if (!parsed.data) return;
-
                         if (parsed.dataType !== 'json') {
                             console.log('[MOD-WS] Cant handle data type', parsed.dataType);
                             return;
@@ -172,7 +165,6 @@
                         }));
                     } catch (e) {
                         console.error('[MOD-WS] error', e);
-                        
                     }
                 });
             }
