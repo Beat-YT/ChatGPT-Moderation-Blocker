@@ -5,8 +5,8 @@ The crx is available for download on the [releases page](https://github.com/Beat
 and on the [chrome web store](https://chrome.google.com/webstore/detail/chat-gpt-anti-censorship/aaibfgjceomfbogoicgjjlabohghmelm)
 
 # ⚠️ IMPORTANT⚠️
-**This extension does not block chat gpt integrated filter, it will still refuse to answer like "sorry this is violating open ai policy"
-check the features below**
+**This extension does not block chat gpt integrated filter, it will still refuse to answer like "sorry I can't help with that".
+Check the features below**
 
 ## Features
 * #### Block content from getting censored after it's written
